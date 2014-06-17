@@ -44,14 +44,13 @@ Create a new application, and set the callback URL to
 plan to run your client app on a differnt port. (See the optional
 section below.)
 
-After creating the app make note of the Application Id and the 
+After creating the app make note of the Application Id and the
 Secret.
 
-## Set some environment variables for your client
+## Settings variables
 
-In your new client project (where you installed this gem), you should
-set some environment variables.  Using something like `foreman` is
-probably the best so that you can just set them in a `.env` file.
+This version of so_auth uses Settings variables (via settingslogic) and not
+environment variables. It reads the following variables from a Settings class:
 
 ```
 AUTH_PROVIDER_URL=http://localhost:3000
@@ -113,7 +112,7 @@ module Rails
     alias :default_options_alias :default_options
     def default_options
       default_options_alias.merge!(:Port => 3001)
-    end    
+    end
   end
 end
 ```

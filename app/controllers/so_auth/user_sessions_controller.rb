@@ -33,7 +33,7 @@ class SoAuth::UserSessionsController < SoAuth::ApplicationController
   def destroy
     reset_session
     flash[:notice] = 'You have successfully signed out!'
-    redirect_to "#{ENV['AUTH_PROVIDER_URL']}/users/sign_out"
+    redirect_to "#{Settings.AUTH_PROVIDER_URL}/users/sign_out"
   end
 
 end
