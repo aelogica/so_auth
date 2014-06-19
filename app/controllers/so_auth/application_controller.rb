@@ -14,21 +14,40 @@ module SoAuth
       cookies[:so_auth].present? && session[:user_id].present? && cookies[:so_auth].to_s == session[:user_id].to_s
     end
 
-    def login_required
-      if !current_user
-        not_authorized
-      end
-    end
+    ActiveSupport.on_load(:action_controller) do
+      ActionController::Base.class_eval do
+        def login_required
+          if !current_user
+            not_authorized
+          end
+        end
 
-    def not_authorized
-      respond_to do |format|
-        format.html{ auth_redirect }
-        format.json{ head :unauthorized }
-      end
-    end
+        def not_authorized
+          respond_to do |format|
+            format.html{ auth_redirect }
+            format.json{ head :unauthorized }
+          end
+        end
 
-    def auth_redirect
-      observable_redirect_to "/auth/so?origin=#{request.protocol}#{request.host_with_port}#{request.fullpath}"
+        def auth_redirect
+          observable_redirect_to "/auth/so?origin=#{request.protocol}#{request.host_with_port}#{request.fullpath}"
+        end
+
+        private
+
+        # These two methods help with testing
+        def integration_test?
+          Rails.env.test? && defined?(Cucumber::Rails)
+        end
+
+        def observable_redirect_to(url)
+          if integration_test?
+            render :text => "If this wasn't an integration test, you'd be redirected to: #{url}"
+          else
+            redirect_to url
+          end
+        end
+      end
     end
 
     def current_user
@@ -42,25 +61,6 @@ module SoAuth
 
     helper_method :signed_in?
     helper_method :current_user
-
-
-
-
-    private
-
-    # These two methods help with testing
-    def integration_test?
-      Rails.env.test? && defined?(Cucumber::Rails)
-    end
-
-    def observable_redirect_to(url)
-      if integration_test?
-        render :text => "If this wasn't an integration test, you'd be redirected to: #{url}"
-      else
-        redirect_to url
-      end
-    end
-
   end
 end
 
